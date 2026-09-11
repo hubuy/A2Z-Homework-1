@@ -9,11 +9,19 @@ BRANCH=gh-pages
 ROOT=$(git rev-parse --show-toplevel)
 WORKTREE=$(mktemp -d)
 
+cleanup() {
+  cd "$ROOT"
+  git worktree remove --force "$WORKTREE" 2>/dev/null || rm -rf "$WORKTREE"
+  git worktree prune
+}
+trap cleanup EXIT
+
 cd "$ROOT"
 npm run build
 
 git fetch origin "$BRANCH"
-git worktree add "$WORKTREE" -B "$BRANCH" "origin/$BRANCH" >/dev/null
+# Detached, so this never collides with a checkout of the branch elsewhere.
+git worktree add --detach "$WORKTREE" FETCH_HEAD >/dev/null
 
 # Replace the published files wholesale, keeping the branch's history.
 cd "$WORKTREE"
@@ -23,11 +31,9 @@ cp -r "$ROOT/dist/." .
 git add -A
 if git diff --cached --quiet; then
   echo "No change to publish."
-else
-  git commit -q -m "Publish $(git -C "$ROOT" rev-parse --short HEAD) to GitHub Pages"
-  git push origin "$BRANCH"
-  echo "Published to https://hubuy.github.io/A2Z-Homework-1/"
+  exit 0
 fi
 
-cd "$ROOT"
-git worktree remove --force "$WORKTREE"
+git commit -q -m "Publish $(git -C "$ROOT" rev-parse --short HEAD) to GitHub Pages"
+git push origin "HEAD:$BRANCH"
+echo "Published to https://hubuy.github.io/A2Z-Homework-1/"
