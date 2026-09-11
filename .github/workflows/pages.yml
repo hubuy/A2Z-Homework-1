@@ -26,9 +26,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # This repo was previously set to serve Pages from a gh-pages branch,
+      # which rejects Actions deployments. Point Pages at the workflow.
+      - name: Use Actions as the Pages source
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow \
+            || gh api -X POST "repos/${{ github.repository }}/pages" -f build_type=workflow
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
