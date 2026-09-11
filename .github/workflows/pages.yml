@@ -1,9 +1,10 @@
 name: Deploy to GitHub Pages
 
-# Run on demand only. Deploying from Actions needs the repository's Pages
-# source set to "GitHub Actions" (Settings → Pages), which the workflow token
-# cannot change on its own; until then an automatic run would only fail.
+# Requires the repository's Pages source to be set to "GitHub Actions"
+# (Settings → Pages); the workflow token cannot change that setting itself.
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 permissions:
