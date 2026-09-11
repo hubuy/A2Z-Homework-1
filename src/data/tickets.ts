@@ -1,27 +1,26 @@
-import seat5 from '../assets/tickets/seat-5.jpg'
-import seat6 from '../assets/tickets/seat-6.jpg'
-import seat7 from '../assets/tickets/seat-7.jpg'
-import seat8 from '../assets/tickets/seat-8.jpg'
+import l6 from '../assets/tickets/117-l-6.jpg'
+import v4 from '../assets/tickets/117-v-4.jpg'
+import z8 from '../assets/tickets/117-z-8.jpg'
 import type { HeldTicket } from '../lib/types'
 
-const IMAGES: Record<number, string> = { 5: seat5, 6: seat6, 7: seat7, 8: seat8 }
-
-/**
- * Tickets held by the demo account: four adjacent seats for one session,
- * each with its own supplied ticket artwork.
- */
-export const MY_TICKETS: HeldTicket[] = [5, 6, 7, 8].map((seat) => ({
-  id: `us-open-msf-115-k-${seat}`,
+const SHARED = {
   eventName: "US Open — Men's Semifinal",
-  session: 'Day Session',
-  date: '2026-09-11T12:00',
+  session: 'Evening Session',
+  date: '2026-09-11T19:00',
   venue: 'Arthur Ashe Stadium',
   complex: 'USTA Billie Jean King National Tennis Center',
-  section: '115',
-  row: 'K',
-  seat: String(seat),
+  section: '117',
   gate: 'Pres Gate',
   ticketType: 'Standard Ticket',
   artwork: 7,
-  image: IMAGES[seat],
-}))
+} as const
+
+/**
+ * Tickets held by the demo account: one session, three seats scattered across
+ * rows rather than sold together, each with its own supplied artwork.
+ */
+export const MY_TICKETS: HeldTicket[] = [
+  { ...SHARED, id: 'us-open-msf-117-l-6', row: 'L', seat: '6', image: l6 },
+  { ...SHARED, id: 'us-open-msf-117-v-4', row: 'V', seat: '4', image: v4 },
+  { ...SHARED, id: 'us-open-msf-117-z-8', row: 'Z', seat: '8', image: z8 },
+]

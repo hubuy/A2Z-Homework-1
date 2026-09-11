@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { formatSeatRange, groupTickets, relativeDay, ticketStatus } from '../tickets'
+import { groupTickets, relativeDay, ticketStatus } from '../tickets'
 import { MY_TICKETS } from '../../data/tickets'
 import type { HeldTicket } from '../types'
 
-function makeTicket(seat: string, overrides: Partial<HeldTicket> = {}): HeldTicket {
+function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = {}): HeldTicket {
   return {
-    id: `t-${seat}`,
-    eventName: 'US Open — Men\'s Semifinal',
-    session: 'Day Session',
-    date: '2026-09-11T12:00',
+    id: `t-${row}-${seat}`,
+    eventName: "US Open — Men's Semifinal",
+    session: 'Evening Session',
+    date: '2026-09-11T19:00',
     venue: 'Arthur Ashe Stadium',
     complex: 'USTA Billie Jean King National Tennis Center',
-    section: '115',
-    row: 'K',
+    section: '117',
+    row,
     seat,
     gate: 'Pres Gate',
     ticketType: 'Standard Ticket',
@@ -22,85 +22,77 @@ function makeTicket(seat: string, overrides: Partial<HeldTicket> = {}): HeldTick
 }
 
 describe('seeded tickets', () => {
-  it('holds four seats in one row', () => {
-    expect(MY_TICKETS).toHaveLength(4)
-    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['5', '6', '7', '8'])
-    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['115']))
-    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['K']))
+  it('holds three seats in one section', () => {
+    expect(MY_TICKETS).toHaveLength(3)
+    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['117']))
+    expect(MY_TICKETS.map((t) => `${t.row}${t.seat}`).sort()).toEqual(['L6', 'V4', 'Z8'])
   })
 
-  it('gives every ticket its supplied artwork', () => {
+  it('gives every ticket a unique id and its own artwork', () => {
+    expect(new Set(MY_TICKETS.map((t) => t.id)).size).toBe(MY_TICKETS.length)
     expect(MY_TICKETS.every((t) => typeof t.image === 'string' && t.image.length > 0)).toBe(true)
     expect(new Set(MY_TICKETS.map((t) => t.image)).size).toBe(MY_TICKETS.length)
   })
 
-  it('gives every ticket a unique id', () => {
-    expect(new Set(MY_TICKETS.map((t) => t.id)).size).toBe(MY_TICKETS.length)
-  })
-
-  it('collapses into a single group covering seats 5-8', () => {
+  it('collapses into one group even though the rows differ', () => {
     const groups = groupTickets(MY_TICKETS)
     expect(groups).toHaveLength(1)
-    expect(groups[0]!.tickets).toHaveLength(4)
-    expect(formatSeatRange(groups[0]!.tickets)).toBe('Seats 5-8')
+    expect(groups[0]!.tickets).toHaveLength(3)
   })
 })
 
 describe('groupTickets', () => {
-  it('splits tickets in different rows', () => {
-    const groups = groupTickets([makeTicket('5'), makeTicket('6', { row: 'L' })])
-    expect(groups).toHaveLength(2)
+  it('keeps seats in different rows of the same session together', () => {
+    const groups = groupTickets([makeTicket('Z', '8'), makeTicket('L', '6')])
+    expect(groups).toHaveLength(1)
+    expect(groups[0]!.tickets).toHaveLength(2)
   })
 
   it('splits tickets for different events', () => {
     const groups = groupTickets([
-      makeTicket('5'),
-      makeTicket('5', { eventName: 'Coastal Open', date: '2026-10-02T13:00' }),
+      makeTicket('L', '6'),
+      makeTicket('L', '6', { eventName: 'Coastal Open', date: '2026-10-02T13:00' }),
     ])
     expect(groups).toHaveLength(2)
   })
 
+  it('splits the day and evening sessions of the same event', () => {
+    const groups = groupTickets([
+      makeTicket('L', '6'),
+      makeTicket('L', '6', { session: 'Day Session', date: '2026-09-11T12:00' }),
+    ])
+    expect(groups).toHaveLength(2)
+  })
+
+  it('orders seats by row, then by seat number', () => {
+    const groups = groupTickets([
+      makeTicket('Z', '8'),
+      makeTicket('L', '10'),
+      makeTicket('L', '6'),
+      makeTicket('V', '4'),
+    ])
+    expect(groups[0]!.tickets.map((t) => `${t.row}${t.seat}`)).toEqual(['L6', 'L10', 'V4', 'Z8'])
+  })
+
   it('orders groups by date', () => {
     const groups = groupTickets([
-      makeTicket('5', { date: '2026-12-01T19:00', eventName: 'Later' }),
-      makeTicket('5', { date: '2026-09-11T12:00', eventName: 'Sooner' }),
+      makeTicket('L', '6', { date: '2026-12-01T19:00', eventName: 'Later' }),
+      makeTicket('L', '6', { date: '2026-09-11T19:00', eventName: 'Sooner' }),
     ])
     expect(groups.map((g) => g.eventName)).toEqual(['Sooner', 'Later'])
   })
 })
 
-describe('formatSeatRange', () => {
-  it('uses a range for consecutive seats', () => {
-    expect(formatSeatRange([makeTicket('1'), makeTicket('2'), makeTicket('3')])).toBe('Seats 1-3')
-  })
-
-  it('lists non-consecutive seats', () => {
-    expect(formatSeatRange([makeTicket('1'), makeTicket('4')])).toBe('Seats 1, 4')
-  })
-
-  it('sorts out-of-order seats', () => {
-    expect(formatSeatRange([makeTicket('4'), makeTicket('2'), makeTicket('3')])).toBe('Seats 2-4')
-  })
-
-  it('uses the singular label for one ticket', () => {
-    expect(formatSeatRange([makeTicket('9')])).toBe('Seat 9')
-  })
-
-  it('falls back to a plain list for non-numeric seats', () => {
-    expect(formatSeatRange([makeTicket('A'), makeTicket('B')])).toBe('Seats A, B')
-  })
-})
-
 describe('ticketStatus', () => {
-  const now = new Date('2026-09-11T18:00')
+  const now = new Date('2026-09-11T22:00')
 
   it('reads as today even after the start time has passed', () => {
-    expect(ticketStatus('2026-09-11T12:00', now)).toBe('today')
+    expect(ticketStatus('2026-09-11T19:00', now)).toBe('today')
   })
 
   it('detects upcoming and past dates', () => {
-    expect(ticketStatus('2026-09-12T12:00', now)).toBe('upcoming')
-    expect(ticketStatus('2026-09-10T12:00', now)).toBe('past')
+    expect(ticketStatus('2026-09-12T19:00', now)).toBe('upcoming')
+    expect(ticketStatus('2026-09-10T19:00', now)).toBe('past')
   })
 })
 
@@ -108,13 +100,13 @@ describe('relativeDay', () => {
   const now = new Date('2026-09-11T09:00')
 
   it('labels nearby days in words', () => {
-    expect(relativeDay('2026-09-11T12:00', now)).toBe('Today')
-    expect(relativeDay('2026-09-12T12:00', now)).toBe('Tomorrow')
-    expect(relativeDay('2026-09-10T12:00', now)).toBe('Yesterday')
+    expect(relativeDay('2026-09-11T19:00', now)).toBe('Today')
+    expect(relativeDay('2026-09-12T19:00', now)).toBe('Tomorrow')
+    expect(relativeDay('2026-09-10T19:00', now)).toBe('Yesterday')
   })
 
   it('counts further days in each direction', () => {
-    expect(relativeDay('2026-09-16T12:00', now)).toBe('In 5 days')
-    expect(relativeDay('2026-09-05T12:00', now)).toBe('6 days ago')
+    expect(relativeDay('2026-09-16T19:00', now)).toBe('In 5 days')
+    expect(relativeDay('2026-09-05T19:00', now)).toBe('6 days ago')
   })
 })

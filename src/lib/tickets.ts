@@ -7,20 +7,28 @@ export type TicketGroup = {
   date: string
   venue: string
   complex: string
-  section: string
-  row: string
-  gate: string
-  ticketType: string
-  artwork: number
   tickets: HeldTicket[]
 }
 
-/** Groups tickets that share an event, session, section and row. */
+/** Orders seats within a group by row, then by seat number. */
+function bySeat(a: HeldTicket, b: HeldTicket): number {
+  const row = a.row.localeCompare(b.row)
+  if (row !== 0) return row
+  const na = Number(a.seat)
+  const nb = Number(b.seat)
+  if (Number.isNaN(na) || Number.isNaN(nb)) return a.seat.localeCompare(b.seat)
+  return na - nb
+}
+
+/**
+ * Groups tickets by the session they admit to, so seats bought together and
+ * seats scattered across rows both read as one set of tickets for one event.
+ */
 export function groupTickets(tickets: HeldTicket[]): TicketGroup[] {
   const groups = new Map<string, TicketGroup>()
 
   for (const ticket of tickets) {
-    const key = [ticket.eventName, ticket.date, ticket.section, ticket.row].join('|')
+    const key = [ticket.eventName, ticket.date, ticket.session].join('|')
     const existing = groups.get(key)
     if (existing) {
       existing.tickets.push(ticket)
@@ -33,34 +41,15 @@ export function groupTickets(tickets: HeldTicket[]): TicketGroup[] {
       date: ticket.date,
       venue: ticket.venue,
       complex: ticket.complex,
-      section: ticket.section,
-      row: ticket.row,
-      gate: ticket.gate,
-      ticketType: ticket.ticketType,
-      artwork: ticket.artwork,
       tickets: [ticket],
     })
   }
 
+  for (const group of groups.values()) {
+    group.tickets.sort(bySeat)
+  }
+
   return [...groups.values()].sort((a, b) => a.date.localeCompare(b.date))
-}
-
-/** "Seats 1-4" when the seats run consecutively, otherwise "Seats 1, 4, 7". */
-export function formatSeatRange(tickets: HeldTicket[]): string {
-  const label = tickets.length === 1 ? 'Seat' : 'Seats'
-  const numbers = tickets.map((t) => Number(t.seat))
-
-  if (numbers.some(Number.isNaN)) {
-    return `${label} ${tickets.map((t) => t.seat).join(', ')}`
-  }
-
-  const sorted = [...numbers].sort((a, b) => a - b)
-  const consecutive = sorted.every((n, i) => i === 0 || n === sorted[i - 1]! + 1)
-
-  if (consecutive && sorted.length > 1) {
-    return `${label} ${sorted[0]}-${sorted[sorted.length - 1]}`
-  }
-  return `${label} ${sorted.join(', ')}`
 }
 
 export type TicketStatus = 'today' | 'upcoming' | 'past'
