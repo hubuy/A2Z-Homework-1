@@ -11,7 +11,7 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
     date: '2026-09-11T19:00',
     venue: 'Arthur Ashe Stadium',
     complex: 'USTA Billie Jean King National Tennis Center',
-    section: '117',
+    section: '107',
     row,
     seat,
     gate: 'Pres Gate',
@@ -22,10 +22,11 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
 }
 
 describe('seeded tickets', () => {
-  it('holds three seats in one section', () => {
+  it('holds three adjacent seats in one row', () => {
     expect(MY_TICKETS).toHaveLength(3)
-    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['117']))
-    expect(MY_TICKETS.map((t) => `${t.row}${t.seat}`).sort()).toEqual(['L6', 'V4', 'Z8'])
+    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['107']))
+    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['U']))
+    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['1', '2', '3'])
   })
 
   it('gives every ticket a unique id and its own artwork', () => {
@@ -34,10 +35,11 @@ describe('seeded tickets', () => {
     expect(new Set(MY_TICKETS.map((t) => t.image)).size).toBe(MY_TICKETS.length)
   })
 
-  it('collapses into one group even though the rows differ', () => {
+  it('collapses into a single group for the session', () => {
     const groups = groupTickets(MY_TICKETS)
     expect(groups).toHaveLength(1)
     expect(groups[0]!.tickets).toHaveLength(3)
+    expect(groups[0]!.session).toBe('Evening Session')
   })
 })
 
