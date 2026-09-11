@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
-import { Artwork } from '../components/Artwork'
-import { CalendarIcon, ClockIcon, PinIcon } from '../components/icons'
+import { PassArt } from '../components/PassArt'
+import { CalendarIcon, ClockIcon, PinIcon, TicketIcon } from '../components/icons'
 import { MY_TICKETS } from '../data/tickets'
 import { formatEventDate, formatEventTime } from '../lib/events'
 import { formatSeatRange, groupTickets, relativeDay, ticketStatus } from '../lib/tickets'
+
+function shortDate(iso: string): string {
+  const d = new Date(iso)
+  return `${d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()} ${d.getDate()}`
+}
 
 export function MyTickets() {
   const groups = groupTickets(MY_TICKETS)
@@ -68,12 +73,22 @@ export function MyTickets() {
               {group.tickets.map((ticket) => (
                 <article className="pass" key={ticket.id}>
                   <div className="pass__top">
-                    <div className="pass__event">{ticket.eventName}</div>
+                    <div className="pass__head">
+                      <span className="pass__event">{ticket.eventName.replace(/^.*— /, '')}</span>
+                      <span className="pass__when">
+                        {shortDate(ticket.date)}
+                        <small>{formatEventTime(ticket.date)}</small>
+                      </span>
+                    </div>
+                    <div className="pass__mark">
+                      <TicketIcon size={26} />
+                      <span>Tixly</span>
+                    </div>
                     <div className="pass__session">{ticket.session}</div>
                   </div>
 
                   <div className="pass__art">
-                    <Artwork seed={ticket.artwork} label={ticket.eventName} />
+                    <PassArt seed={ticket.artwork} label={ticket.eventName} />
                   </div>
 
                   <div className="pass__seat">
@@ -98,11 +113,10 @@ export function MyTickets() {
                   </div>
 
                   <div className="pass__foot">
-                    <div>
-                      <div className="pass__type">{ticket.ticketType}</div>
-                      <div className="pass__venue">{ticket.venue}</div>
+                    <div className="pass__fine">
+                      <div>{ticket.ticketType}</div>
+                      <div>{ticket.venue}</div>
                     </div>
-                    <div className="pass__brand">Tixly</div>
                   </div>
                 </article>
               ))}
@@ -117,8 +131,8 @@ export function MyTickets() {
               </button>
             </div>
             <p className="holding__note">
-              These passes are demo records displayed inside Tixly. They carry no barcode and are
-              not valid for entry — the real tickets live in the issuer's own app.
+              Sample passes seeded into this demo. They carry no barcode and are not valid for
+              entry.
             </p>
           </section>
         )
