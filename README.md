@@ -17,6 +17,8 @@ simulated checkout.
 - **Checkout → confirmation** — contact/payment/delivery form and an order reference
 - Responsive down to phone width; artwork is generated SVG, so there are no binary image assets
 
+**Live:** <https://hubuy.github.io/A2Z-Homework-1/>
+
 ## Getting started
 
 ```bash
@@ -34,6 +36,28 @@ npm run dev      # http://localhost:5173
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm test` | Run the Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode |
+
+## Deployment
+
+GitHub Pages serves this repository from the `gh-pages` branch, which holds the
+built site rather than source. To publish the current `HEAD`:
+
+```bash
+scripts/deploy-gh-pages.sh
+```
+
+It builds, replaces the files on `gh-pages` with `dist/`, and pushes. The
+branch's history is kept — no force push.
+
+`.github/workflows/pages.yml` deploys the same build through GitHub Actions
+instead, but it only works once **Settings → Pages → Source** is switched to
+**GitHub Actions**. While Pages serves from a branch, the deployment API
+rejects it (`Deployments are only allowed from gh-pages`), so that workflow is
+manual-dispatch only. After switching the source, set it to run on pushes to
+`master` and drop the script.
+
+The build uses relative asset URLs (`base: './'`) and hash routing, so it runs
+unchanged from the `/A2Z-Homework-1/` project path.
 
 ## Project layout
 
