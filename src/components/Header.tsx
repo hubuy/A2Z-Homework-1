@@ -29,11 +29,15 @@ export function Header() {
         <div className="header__actions">
           <button className="iconbtn" type="button">
             <UserIcon />
-            <span>Sign in</span>
+            <span className="iconbtn__label">Sign in</span>
           </button>
+          <Link className="iconbtn" to="/tickets">
+            <TicketIcon />
+            <span className="iconbtn__label">My tickets</span>
+          </Link>
           <Link className="iconbtn" to="/cart">
             <CartIcon />
-            <span>Cart</span>
+            <span className="iconbtn__label">Cart</span>
             {ticketCount > 0 && <span className="iconbtn__badge">{ticketCount}</span>}
           </Link>
         </div>

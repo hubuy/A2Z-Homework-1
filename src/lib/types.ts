@@ -35,3 +35,26 @@ export type CartLine = {
   tierId: string
   quantity: number
 }
+
+/**
+ * A ticket already owned by the signed-in user, shown under My Tickets.
+ * Separate from catalog `Event`s, which are things still on sale.
+ */
+export type HeldTicket = {
+  id: string
+  eventName: string
+  /** Session or round label, e.g. "Day Session". */
+  session: string
+  /** ISO-8601 local date-time. */
+  date: string
+  venue: string
+  /** The wider grounds or complex the venue sits in. */
+  complex: string
+  section: string
+  row: string
+  seat: string
+  /** Entry gate printed on the ticket. */
+  gate: string
+  ticketType: string
+  artwork: number
+}
