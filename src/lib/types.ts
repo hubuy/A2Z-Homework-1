@@ -57,4 +57,6 @@ export type HeldTicket = {
   gate: string
   ticketType: string
   artwork: number
+  /** Artwork supplied with the ticket; falls back to generated art when absent. */
+  image?: string
 }

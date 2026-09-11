@@ -1,14 +1,9 @@
 import { Link } from 'react-router-dom'
-import { PassArt } from '../components/PassArt'
-import { CalendarIcon, ClockIcon, PinIcon, TicketIcon } from '../components/icons'
+import { CalendarIcon, ClockIcon, PinIcon } from '../components/icons'
+import { TicketWallet } from '../components/TicketWallet'
 import { MY_TICKETS } from '../data/tickets'
 import { formatEventDate, formatEventTime } from '../lib/events'
-import { formatSeatRange, groupTickets, relativeDay, ticketStatus } from '../lib/tickets'
-
-function shortDate(iso: string): string {
-  const d = new Date(iso)
-  return `${d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()} ${d.getDate()}`
-}
+import { groupTickets, relativeDay, ticketStatus } from '../lib/tickets'
 
 export function MyTickets() {
   const groups = groupTickets(MY_TICKETS)
@@ -31,17 +26,11 @@ export function MyTickets() {
   }
 
   return (
-    <div className="wrap page">
-      <h1>My tickets</h1>
-      <p className="lede">
-        {MY_TICKETS.length} {MY_TICKETS.length === 1 ? 'ticket' : 'tickets'} across{' '}
-        {groups.length} {groups.length === 1 ? 'event' : 'events'}.
-      </p>
+    <div className="tickets">
+      <h1 className="tickets__title">My tickets</h1>
 
-      {groups.map((group) => {
-        const status = ticketStatus(group.date)
-        return (
-          <section className="holding" key={group.key}>
+      {groups.map((group) => (
+        <section className="holding" key={group.key}>
             <header className="holding__head">
               <div>
                 <h2>{group.eventName}</h2>
@@ -61,66 +50,12 @@ export function MyTickets() {
                 </div>
                 <div className="holding__complex">{group.complex}</div>
               </div>
-              <div className="holding__status">
-                <span className={`pill pill--${status}`}>{relativeDay(group.date)}</span>
-                <span className="holding__seats">
-                  Sec {group.section} · Row {group.row} · {formatSeatRange(group.tickets)}
-                </span>
-              </div>
+              <span className={`pill pill--${ticketStatus(group.date)}`}>
+                {relativeDay(group.date)}
+              </span>
             </header>
 
-            <div className="passes">
-              {group.tickets.map((ticket) => (
-                <article className="pass" key={ticket.id}>
-                  <div className="pass__top">
-                    <div className="pass__head">
-                      <span className="pass__event">{ticket.eventName.replace(/^.*— /, '')}</span>
-                      <span className="pass__when">
-                        {shortDate(ticket.date)}
-                        <small>{formatEventTime(ticket.date)}</small>
-                      </span>
-                    </div>
-                    <div className="pass__mark">
-                      <TicketIcon size={26} />
-                      <span>Tixly</span>
-                    </div>
-                    <div className="pass__session">{ticket.session}</div>
-                  </div>
-
-                  <div className="pass__art">
-                    <PassArt seed={ticket.artwork} label={ticket.eventName} />
-                  </div>
-
-                  <div className="pass__seat">
-                    <div className="pass__gate">
-                      <span>Enter</span>
-                      {ticket.gate}
-                    </div>
-                    <dl className="pass__grid">
-                      <div>
-                        <dt>Sec</dt>
-                        <dd>{ticket.section}</dd>
-                      </div>
-                      <div>
-                        <dt>Row</dt>
-                        <dd>{ticket.row}</dd>
-                      </div>
-                      <div>
-                        <dt>Seat</dt>
-                        <dd>{ticket.seat}</dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  <div className="pass__foot">
-                    <div className="pass__fine">
-                      <div>{ticket.ticketType}</div>
-                      <div>{ticket.venue}</div>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+          <TicketWallet tickets={group.tickets} />
 
             <div className="holding__actions">
               <button className="btn btn--ghost" type="button">
@@ -131,12 +66,11 @@ export function MyTickets() {
               </button>
             </div>
             <p className="holding__note">
-              Sample passes seeded into this demo. They carry no barcode and are not valid for
-              entry.
+              Swipe, or use the arrows, to move between tickets. These are sample passes seeded
+              into the demo and are not valid for entry.
             </p>
-          </section>
-        )
-      })}
+        </section>
+      ))}
     </div>
   )
 }

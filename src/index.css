@@ -295,12 +295,12 @@ img { max-width: 100%; display: block; }
 }
 
 /* ---------- my tickets ---------- */
-.holding { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; }
-.holding__head { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-.holding__head h2 { margin: 0 0 8px; font-size: 21px; letter-spacing: -0.5px; }
-.holding__meta { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--muted); font-size: 13.5px; }
+.holding { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; overflow: hidden; }
+.holding__head { display: flex; flex-wrap: wrap; gap: 10px 16px; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.holding__head h2 { margin: 0 0 6px; font-size: 18px; letter-spacing: -0.4px; }
+.holding__meta { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--muted); font-size: 13px; }
 .holding__meta span { display: inline-flex; align-items: center; gap: 7px; }
-.holding__complex { color: var(--muted); font-size: 13px; margin-top: 5px; }
+.holding__complex { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
 .holding__status { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; }
 .holding__seats { font-size: 13.5px; font-weight: 700; }
 .holding__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
@@ -311,55 +311,63 @@ img { max-width: 100%; display: block; }
 .pill--upcoming { background: #e6efff; color: var(--brand); }
 .pill--past { background: var(--paper-2); color: var(--muted); }
 
-.passes { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.tickets { max-width: var(--max); margin: 0 auto; padding: 28px 20px 56px; }
+.tickets__title { margin: 0 0 16px; font-size: 24px; letter-spacing: -0.7px; }
 
-.pass {
-  border-radius: 14px; overflow: hidden; color: #fff;
-  background: #0b2560;
-  display: flex; flex-direction: column;
-  box-shadow: 0 6px 20px rgba(11, 37, 96, 0.28);
+/* One ticket per page, swiped horizontally. */
+.wallet { margin: 14px 0 4px; }
+.wallet__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
-/* The notch that reads as a torn stub on a physical ticket. */
-.pass__top { position: relative; padding: 14px 14px 0; background: linear-gradient(180deg, #0a1f52, #0b2560); }
-.pass__top::before {
-  content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-  width: 78px; height: 30px; border-radius: 0 0 40px 40px; background: var(--paper);
+.wallet__track::-webkit-scrollbar { display: none; }
+.wallet__track:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.wallet__page {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  justify-content: center;
+  padding-inline: 8px;
 }
-.pass__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.pass__event { font-weight: 800; font-size: 14.5px; letter-spacing: -0.2px; }
-.pass__when {
-  text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap;
+.wallet__ticket {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 34px rgba(16, 19, 28, 0.22);
+  background: var(--ink);
+  max-width: 440px;
+  width: 100%;
+  align-self: flex-start;
 }
-.pass__when small { display: block; font-size: 12px; font-weight: 500; opacity: 0.88; }
-.pass__mark { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 0 12px; }
-.pass__mark span { font-size: 17px; font-weight: 800; letter-spacing: -0.4px; }
-.pass__session {
-  background: #fff; color: #0b2560;
-  font-weight: 800; font-size: 12px; letter-spacing: 1.3px; text-transform: uppercase;
-  padding: 6px; border-radius: 3px; text-align: center;
+.wallet__ticket img { width: 100%; height: auto; display: block; user-select: none; }
+.wallet__fallback { aspect-ratio: 887 / 1133; }
+
+.wallet__bar { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 18px; }
+.wallet__status { text-align: center; min-width: 190px; }
+.wallet__count { font-weight: 800; font-size: 14px; }
+.wallet__seat { color: var(--muted); font-size: 13px; }
+.wallet__arrow {
+  width: 42px; height: 42px; flex-shrink: 0;
+  border-radius: 50%; border: 1px solid var(--line); background: #fff;
+  color: var(--brand); font-size: 24px; line-height: 1;
+  display: grid; place-items: center;
 }
-.pass__art { aspect-ratio: 16 / 10; background: #0b2560; }
-.pass__seat {
-  background: linear-gradient(180deg, rgba(74, 136, 206, 0.92), #4f8ed6);
-  padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-top: -1px;
+.wallet__arrow:not(:disabled):hover { background: var(--paper-2); }
+.wallet__arrow:disabled { color: #c4c9d4; cursor: not-allowed; }
+
+.wallet__dots { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+.wallet__dot {
+  width: 9px; height: 9px; padding: 0; border-radius: 50%;
+  border: 0; background: #cbd2df;
 }
-.pass__gate { font-size: 11.5px; font-weight: 800; line-height: 1.25; text-transform: uppercase; letter-spacing: 0.5px; }
-.pass__gate span { display: block; opacity: 0.85; font-weight: 700; }
-.pass__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0; flex: 1; }
-.pass__grid div { text-align: center; }
-.pass__grid dt { font-size: 11.5px; opacity: 0.92; }
-.pass__grid dd { margin: 0; font-size: 27px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.pass__foot { background: #4f8ed6; padding: 0 14px 13px; }
-.pass__fine {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px; line-height: 1.45; opacity: 0.95;
-}
+.wallet__dot--on { background: var(--brand); transform: scale(1.25); }
 
 @media (max-width: 520px) {
-  .holding { padding: 16px; }
   .holding__status { align-items: flex-start; }
-  .passes { grid-template-columns: 1fr; }
 }
 
 /* Collapse header action labels to icons when space is tight. */
