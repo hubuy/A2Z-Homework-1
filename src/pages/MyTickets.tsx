@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CalendarIcon, ClockIcon, PinIcon } from '../components/icons'
+import { CalendarIcon, ClockIcon, PinIcon, WalletIcon } from '../components/icons'
 import { TicketWallet } from '../components/TicketWallet'
 import { MY_TICKETS } from '../data/tickets'
 import { formatEventDate, formatEventTime } from '../lib/events'
@@ -62,6 +62,7 @@ export function MyTickets() {
                 Transfer tickets
               </button>
               <button className="btn btn--ghost" type="button">
+                <WalletIcon />
                 Add to wallet
               </button>
             </div>

@@ -303,7 +303,7 @@ img { max-width: 100%; display: block; }
 .holding__complex { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
 .holding__status { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; }
 .holding__seats { font-size: 13.5px; font-weight: 700; }
-.holding__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.holding__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
 .holding__note { color: var(--muted); font-size: 12.5px; margin: 12px 0 0; }
 
 .pill { border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }

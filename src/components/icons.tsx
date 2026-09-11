@@ -67,3 +67,18 @@ export const CheckIcon = ({ size = 30 }: IconProps) => (
     <path d="m5 12.5 4.6 4.6L19 7.5" />
   </svg>
 )
+
+/**
+ * Wallet glyph for the "add to wallet" action: a card stack tucked into a
+ * wallet. Drawn rather than imported so no third-party badge art is bundled.
+ */
+export const WalletIcon = ({ size = 18 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden={true}>
+    <rect x="6" y="2.5" width="12" height="6" rx="1.5" fill="#f59e0b" />
+    <rect x="4.5" y="4.6" width="15" height="6" rx="1.5" fill="#22c55e" />
+    <rect x="3" y="6.7" width="18" height="6" rx="1.5" fill="#3b82f6" />
+    <rect x="2" y="10" width="20" height="11.5" rx="2.6" fill="#1f2937" />
+    <rect x="13.5" y="13.4" width="8.5" height="4.7" rx="1.4" fill="#4b5563" />
+    <circle cx="17" cy="15.75" r="1.15" fill="#e5e7eb" />
+  </svg>
+)
