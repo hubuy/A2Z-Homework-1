@@ -11,8 +11,8 @@ function makeTicket(seat: string, overrides: Partial<HeldTicket> = {}): HeldTick
     date: '2026-09-11T12:00',
     venue: 'Arthur Ashe Stadium',
     complex: 'USTA Billie Jean King National Tennis Center',
-    section: '107',
-    row: 'S',
+    section: '115',
+    row: 'K',
     seat,
     gate: 'Pres Gate',
     ticketType: 'Standard Ticket',
@@ -24,41 +24,46 @@ function makeTicket(seat: string, overrides: Partial<HeldTicket> = {}): HeldTick
 describe('seeded tickets', () => {
   it('holds four seats in one row', () => {
     expect(MY_TICKETS).toHaveLength(4)
-    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['1', '2', '3', '4'])
-    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['107']))
-    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['S']))
+    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['5', '6', '7', '8'])
+    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['115']))
+    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['K']))
+  })
+
+  it('gives every ticket its supplied artwork', () => {
+    expect(MY_TICKETS.every((t) => typeof t.image === 'string' && t.image.length > 0)).toBe(true)
+    expect(new Set(MY_TICKETS.map((t) => t.image)).size).toBe(MY_TICKETS.length)
   })
 
   it('gives every ticket a unique id', () => {
     expect(new Set(MY_TICKETS.map((t) => t.id)).size).toBe(MY_TICKETS.length)
   })
 
-  it('collapses into a single group covering seats 1-4', () => {
+  it('collapses into a single group covering seats 5-8', () => {
     const groups = groupTickets(MY_TICKETS)
     expect(groups).toHaveLength(1)
     expect(groups[0]!.tickets).toHaveLength(4)
-    expect(formatSeatRange(groups[0]!.tickets)).toBe('Seats 1-4')
+    expect(formatSeatRange(groups[0]!.tickets)).toBe('Seats 5-8')
   })
 })
 
 describe('groupTickets', () => {
   it('splits tickets in different rows', () => {
-    const groups = groupTickets([makeTicket('1'), makeTicket('2', { row: 'T' })])
+    const groups = groupTickets([makeTicket('5'), makeTicket('6', { row: 'L' })])
     expect(groups).toHaveLength(2)
   })
 
   it('splits tickets for different events', () => {
     const groups = groupTickets([
-      makeTicket('1'),
-      makeTicket('1', { eventName: 'Coastal Open', date: '2026-10-02T13:00' }),
+      makeTicket('5'),
+      makeTicket('5', { eventName: 'Coastal Open', date: '2026-10-02T13:00' }),
     ])
     expect(groups).toHaveLength(2)
   })
 
   it('orders groups by date', () => {
     const groups = groupTickets([
-      makeTicket('1', { date: '2026-12-01T19:00', eventName: 'Later' }),
-      makeTicket('1', { date: '2026-09-11T12:00', eventName: 'Sooner' }),
+      makeTicket('5', { date: '2026-12-01T19:00', eventName: 'Later' }),
+      makeTicket('5', { date: '2026-09-11T12:00', eventName: 'Sooner' }),
     ])
     expect(groups.map((g) => g.eventName)).toEqual(['Sooner', 'Later'])
   })
