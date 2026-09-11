@@ -11,7 +11,7 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
     date: '2026-09-11T19:00',
     venue: 'Arthur Ashe Stadium',
     complex: 'USTA Billie Jean King National Tennis Center',
-    section: '107',
+    section: '115',
     row,
     seat,
     gate: 'Pres Gate',
@@ -24,9 +24,9 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
 describe('seeded tickets', () => {
   it('holds three adjacent seats in one row', () => {
     expect(MY_TICKETS).toHaveLength(3)
-    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['107']))
-    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['U']))
-    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['1', '2', '3'])
+    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['115']))
+    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['H']))
+    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['5', '6', '7'])
   })
 
   it('gives every ticket a unique id and its own artwork', () => {
