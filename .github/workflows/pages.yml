@@ -1,8 +1,9 @@
 name: Deploy to GitHub Pages
 
+# Run on demand only. Deploying from Actions needs the repository's Pages
+# source set to "GitHub Actions" (Settings → Pages), which the workflow token
+# cannot change on its own; until then an automatic run would only fail.
 on:
-  push:
-    branches: [master, claude/app-creation-mnfr8k]
   workflow_dispatch:
 
 permissions:
@@ -26,14 +27,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      # This repo was previously set to serve Pages from a gh-pages branch,
-      # which rejects Actions deployments. Point Pages at the workflow.
-      - name: Use Actions as the Pages source
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow \
-            || gh api -X POST "repos/${{ github.repository }}/pages" -f build_type=workflow
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
