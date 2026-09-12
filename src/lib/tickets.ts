@@ -10,14 +10,21 @@ export type TicketGroup = {
   tickets: HeldTicket[]
 }
 
-/** Orders seats within a group by row, then by seat number. */
-function bySeat(a: HeldTicket, b: HeldTicket): number {
-  const row = a.row.localeCompare(b.row)
-  if (row !== 0) return row
-  const na = Number(a.seat)
-  const nb = Number(b.seat)
-  if (Number.isNaN(na) || Number.isNaN(nb)) return a.seat.localeCompare(b.seat)
+/** Compares two labels numerically when both are numbers, else as text. */
+function compareLabel(a: string, b: string): number {
+  const na = Number(a)
+  const nb = Number(b)
+  if (Number.isNaN(na) || Number.isNaN(nb)) return a.localeCompare(b)
   return na - nb
+}
+
+/** Orders seats within a group by section, then row, then seat number. */
+function bySeat(a: HeldTicket, b: HeldTicket): number {
+  const section = compareLabel(a.section, b.section)
+  if (section !== 0) return section
+  const row = compareLabel(a.row, b.row)
+  if (row !== 0) return row
+  return compareLabel(a.seat, b.seat)
 }
 
 /**

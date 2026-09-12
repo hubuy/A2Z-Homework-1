@@ -5,7 +5,7 @@ import type { HeldTicket } from '../types'
 
 function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = {}): HeldTicket {
   return {
-    id: `t-${row}-${seat}`,
+    id: `t-${row}-${seat}-${overrides.section ?? '121'}`,
     eventName: "US Open — Men's Semifinal",
     session: 'Evening Session',
     date: '2026-09-11T19:00',
@@ -22,11 +22,15 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
 }
 
 describe('seeded tickets', () => {
-  it('holds three adjacent seats in one row', () => {
-    expect(MY_TICKETS).toHaveLength(3)
-    expect(new Set(MY_TICKETS.map((t) => t.section))).toEqual(new Set(['121']))
-    expect(new Set(MY_TICKETS.map((t) => t.row))).toEqual(new Set(['E']))
-    expect(MY_TICKETS.map((t) => t.seat)).toEqual(['5', '6', '7'])
+  it('holds five seats bought in two blocks', () => {
+    expect(MY_TICKETS).toHaveLength(5)
+    expect(MY_TICKETS.map((t) => `${t.section}-${t.row}${t.seat}`)).toEqual([
+      '121-E5',
+      '121-E6',
+      '121-E7',
+      '107-Z5',
+      '107-Z6',
+    ])
   })
 
   it('gives every ticket a unique id and its own artwork', () => {
@@ -35,11 +39,17 @@ describe('seeded tickets', () => {
     expect(new Set(MY_TICKETS.map((t) => t.image)).size).toBe(MY_TICKETS.length)
   })
 
-  it('collapses into a single group for the session', () => {
+  it('collapses into a single group for the session, ordered by section', () => {
     const groups = groupTickets(MY_TICKETS)
     expect(groups).toHaveLength(1)
-    expect(groups[0]!.tickets).toHaveLength(3)
     expect(groups[0]!.session).toBe('Evening Session')
+    expect(groups[0]!.tickets.map((t) => `${t.section}-${t.row}${t.seat}`)).toEqual([
+      '107-Z5',
+      '107-Z6',
+      '121-E5',
+      '121-E6',
+      '121-E7',
+    ])
   })
 })
 
@@ -74,6 +84,15 @@ describe('groupTickets', () => {
       makeTicket('V', '4'),
     ])
     expect(groups[0]!.tickets.map((t) => `${t.row}${t.seat}`)).toEqual(['L6', 'L10', 'V4', 'Z8'])
+  })
+
+  it('orders by section before row, numerically', () => {
+    const groups = groupTickets([
+      makeTicket('E', '5', { section: '121' }),
+      makeTicket('Z', '5', { section: '107' }),
+      makeTicket('A', '1', { section: '9' }),
+    ])
+    expect(groups[0]!.tickets.map((t) => t.section)).toEqual(['9', '107', '121'])
   })
 
   it('orders groups by date', () => {
