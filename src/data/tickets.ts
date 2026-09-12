@@ -1,6 +1,6 @@
-import e5 from '../assets/tickets/121-e-5.jpg'
-import e6 from '../assets/tickets/121-e-6.jpg'
-import e7 from '../assets/tickets/121-e-7.jpg'
+import t11 from '../assets/tickets/118-t-11.jpg'
+import t12 from '../assets/tickets/118-t-12.jpg'
+import t13 from '../assets/tickets/118-t-13.jpg'
 import type { HeldTicket } from '../lib/types'
 
 const SHARED = {
@@ -9,8 +9,8 @@ const SHARED = {
   date: '2026-09-11T19:00',
   venue: 'Arthur Ashe Stadium',
   complex: 'USTA Billie Jean King National Tennis Center',
-  section: '121',
-  row: 'E',
+  section: '118',
+  row: 'T',
   gate: 'Pres Gate',
   ticketType: 'Standard Ticket',
   artwork: 7,
@@ -21,7 +21,7 @@ const SHARED = {
  * each with its own supplied artwork.
  */
 export const MY_TICKETS: HeldTicket[] = [
-  { ...SHARED, id: 'us-open-msf-121-e-5', seat: '5', image: e5 },
-  { ...SHARED, id: 'us-open-msf-121-e-6', seat: '6', image: e6 },
-  { ...SHARED, id: 'us-open-msf-121-e-7', seat: '7', image: e7 },
+  { ...SHARED, id: 'us-open-msf-118-t-11', seat: '11', image: t11 },
+  { ...SHARED, id: 'us-open-msf-118-t-12', seat: '12', image: t12 },
+  { ...SHARED, id: 'us-open-msf-118-t-13', seat: '13', image: t13 },
 ]
