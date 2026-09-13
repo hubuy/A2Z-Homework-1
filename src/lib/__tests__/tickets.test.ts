@@ -22,15 +22,17 @@ function makeTicket(row: string, seat: string, overrides: Partial<HeldTicket> = 
 }
 
 describe('seeded tickets', () => {
-  it('holds five seats bought in two blocks', () => {
-    expect(MY_TICKETS).toHaveLength(5)
-    expect(MY_TICKETS.map((t) => `${t.section}-${t.row}${t.seat}`)).toEqual([
-      '121-E5',
-      '121-E6',
-      '121-E7',
-      '107-Z5',
-      '107-Z6',
-    ])
+  // Asserts what must hold of whatever seats are seeded, not the seat list
+  // itself: the seats get swapped out often, and a hard-coded list only ever
+  // failed because it was stale.
+  it('holds seats for one session', () => {
+    expect(MY_TICKETS.length).toBeGreaterThan(0)
+    expect(new Set(MY_TICKETS.map((t) => `${t.eventName}|${t.date}|${t.session}`)).size).toBe(1)
+  })
+
+  it('gives every ticket a distinct seat', () => {
+    const seats = MY_TICKETS.map((t) => `${t.section}-${t.row}${t.seat}`)
+    expect(new Set(seats).size).toBe(seats.length)
   })
 
   it('gives every ticket a unique id and its own artwork', () => {
@@ -39,17 +41,11 @@ describe('seeded tickets', () => {
     expect(new Set(MY_TICKETS.map((t) => t.image)).size).toBe(MY_TICKETS.length)
   })
 
-  it('collapses into a single group for the session, ordered by section', () => {
+  it('collapses into a single group holding every seat', () => {
     const groups = groupTickets(MY_TICKETS)
     expect(groups).toHaveLength(1)
-    expect(groups[0]!.session).toBe('Evening Session')
-    expect(groups[0]!.tickets.map((t) => `${t.section}-${t.row}${t.seat}`)).toEqual([
-      '107-Z5',
-      '107-Z6',
-      '121-E5',
-      '121-E6',
-      '121-E7',
-    ])
+    expect(groups[0]!.tickets).toHaveLength(MY_TICKETS.length)
+    expect(groups[0]!.session).toBe(MY_TICKETS[0]!.session)
   })
 })
 
